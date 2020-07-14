@@ -23,9 +23,9 @@ cd $BUILD
 
 #Export build type
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-if [ $BRANCH == "kernel-hmp" ]; then
+if [ $BRANCH == "nethunter-hmp" ]; then
     export TYPE=hmp
-elif [ $BRANCH == "kernel-eas" ]; then
+elif [ $BRANCH == "nethunter-eas" ]; then
     export TYPE=eas
 elif [ $BRANCH == "kernel-eas-oc" ]; then
     export TYPE=eas-oc
