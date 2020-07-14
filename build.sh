@@ -7,8 +7,8 @@
 wd=$(pwd)
 out="/mnt/kernels/android_kernel_xiaomi_whyred/out/"
 BUILD="/mnt/kernels/android_kernel_xiaomi_whyred/"
-ANYKERNEL_DIR_EAS="/home/theradcolor/whyred/anykernel-eas/"
-ANYKERNEL_DIR_HMP="/home/theradcolor/whyred/anykernel-hmp/"
+ANYKERNEL_DIR_EAS="/mnt/kernels/android_kernel_xiaomi_whyred/anykernel-eas/"
+ANYKERNEL_DIR_HMP="/mnt/kernels/android_kernel_xiaomi_whyred/anykernel-hmp/"
 IMG="/mnt/kernels/android_kernel_xiaomi_whyred/out/arch/arm64/boot/Image.gz-dtb"
 DATE=$(date +"%d-%m-%y")
 BUILD_START=$(date +"%s")
@@ -68,13 +68,19 @@ function build_clang()
     #make O=$out clean
     #make O=$out mrproper
     rm -rf $out/arch/arm64/boot
-    make O=$out whyred-nh_defconfig
+    make O=$out whyred-nh-newcam_defconfig
 
     make O=$out CC="${CC}" \
     CROSS_COMPILE="${GCC64}" \
     CROSS_COMPILE_ARM32="${GCC32}" \
     CLANG_TRIPLE="${CLANG_TRIPLE}" \
-    -j6  2>&1| tee $out/kernel.log
+    -j8  2>&1| tee $out/kernel.log
+    
+    make O=$out CC="${CC}" \
+    CROSS_COMPILE="${GCC64}" \
+    CROSS_COMPILE_ARM32="${GCC32}" \
+    CLANG_TRIPLE="${CLANG_TRIPLE}" \
+    -j8 modules_install INSTALL_MOD_PATH=modules_out
     
     if [ -f $IMG ]; then
         BUILD_END=$(date +"%s")
@@ -108,7 +114,7 @@ function flash_zip()
     fi
 
     check_camera
-    export ZIPNAME=rad-$TYPE-$CAM_TYPE-whyred.zip
+    export ZIPNAME=Team420-$TYPE-$CAM_TYPE-whyred.zip
 
     #Cleanup and copy Image.gz-dtb to dir.
     rm -f *.zip
@@ -121,7 +127,7 @@ function flash_zip()
 
 function check_camera()
 {
-    CAMERA="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-nh_defconfig)"
+    CAMERA="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-nh-newcam_defconfig)"
     if [ $CAMERA == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=y" ]; then
             CAM_TYPE="newcam"
         elif [ $CAMERA == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=n" ]; then
@@ -139,9 +145,9 @@ function change_camera()
     fi
     
     #Change the compability
-    sed -i 's/'"$CAMERA"/"$PATCH"'/g' $BUILD/arch/arm64/configs/whyred-nh_defconfig
+    sed -i 's/'"$CAMERA"/"$PATCH"'/g' $BUILD/arch/arm64/configs/whyred-nh-newcam_defconfig
     
-    AFTER_PATCH="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-nh_defconfig)"
+    AFTER_PATCH="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-nh-newcam_defconfig)"
     if [ $AFTER_PATCH == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=y" ]; then
         echo -e $green"Changed compability for NEW camera blobs!"$white
     elif [ $AFTER_PATCH == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=n" ]; then
