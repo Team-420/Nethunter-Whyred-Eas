@@ -57,7 +57,7 @@ function set_param()
     export KBUILD_BUILD_HOST="Kali"
     
     #Compiler String
-    CC="${ccache} /mnt/kernels/clang11/bin/clang"
+    CC="${ccache} /mnt/kernels/clang11/Clang-11/bin/clang"
     export KBUILD_COMPILER_STRING="$(${CC} --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g')"
 }
 
@@ -65,10 +65,10 @@ function set_param()
 function build_clang()
 {
     set_param
-    make O=$out clean
-    make O=$out mrproper
+    #make O=$out clean
+    #make O=$out mrproper
     rm -rf $out/arch/arm64/boot
-    make O=$out whyred-perf_defconfig
+    make O=$out whyred-nh_defconfig
 
     make O=$out CC="${CC}" \
     CROSS_COMPILE="${GCC64}" \
@@ -121,7 +121,7 @@ function flash_zip()
 
 function check_camera()
 {
-    CAMERA="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-perf_defconfig)"
+    CAMERA="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-nh_defconfig)"
     if [ $CAMERA == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=y" ]; then
             CAM_TYPE="newcam"
         elif [ $CAMERA == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=n" ]; then
@@ -139,9 +139,9 @@ function change_camera()
     fi
     
     #Change the compability
-    sed -i 's/'"$CAMERA"/"$PATCH"'/g' $BUILD/arch/arm64/configs/whyred-perf_defconfig
+    sed -i 's/'"$CAMERA"/"$PATCH"'/g' $BUILD/arch/arm64/configs/whyred-nh_defconfig
     
-    AFTER_PATCH="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-perf_defconfig)"
+    AFTER_PATCH="$(grep 'BLOBS' $BUILD/arch/arm64/configs/whyred-nh_defconfig)"
     if [ $AFTER_PATCH == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=y" ]; then
         echo -e $green"Changed compability for NEW camera blobs!"$white
     elif [ $AFTER_PATCH == "CONFIG_XIAOMI_NEW_CAMERA_BLOBS=n" ]; then
