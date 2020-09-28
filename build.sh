@@ -186,9 +186,9 @@ checkout_source
 # Configure enviroments
 set_param_clang
 if [[ "$@" =~ "newcam" ]]; then
-    config="whyred-newcam_defconfig"
+    config="whyred-newcam-nh_defconfig"
 else
-    config="whyred_defconfig"
+    config="whyred-nh_defconfig"
     # Push build message to telegram
     tg_inform
 fi
