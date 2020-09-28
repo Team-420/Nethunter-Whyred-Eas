@@ -53,6 +53,7 @@ Module.symvers
 /Module.markers
 /clang
 /AnyKernel3
+/out
 
 #
 # Debian directory (make deb-pkg)
