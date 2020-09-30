@@ -54,6 +54,8 @@ Module.symvers
 /clang
 /AnyKernel3
 /out
+/clang-bk
+
 
 #
 # Debian directory (make deb-pkg)
