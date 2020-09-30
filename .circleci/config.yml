@@ -7,7 +7,7 @@ jobs:
       - run:
           command: |
            pacman -Sy base-devel bc llvm curl wget git --noconfirm
-           git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b $CIRCLE_BRANCH source
+           git clone --depth=1 https://github.com/Team-420/Nethunter-Whyred-Eas.git -b $CIRCLE_BRANCH source
            cd source
            git clone --depth=1 https://github.com/theradcolor/lazyscripts.git -b master
            sed -i "s/token=.*/token=$TG_BOT_API/g" build.sh
@@ -19,7 +19,7 @@ jobs:
       - run:
           command: |
            pacman -Sy base-devel bc llvm curl wget git --noconfirm
-           git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b kernel-eas source
+           git clone --depth=1 hhttps://github.com/Team-420/Nethunter-Whyred-Eas.git -b kernel-eas source
            cd source
            git clone --depth=1 https://github.com/theradcolor/lazyscripts.git -b master
            sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
@@ -31,7 +31,7 @@ jobs:
       - run:
           command: |
            pacman -Sy base-devel bc llvm curl wget git --noconfirm
-           git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b kernel-eas source
+           git clone --depth=1 https://github.com/Team-420/Nethunter-Whyred-Eas.git -b kernel-eas source
            cd source
            git clone --depth=1 https://github.com/theradcolor/lazyscripts.git -b master
            sed -i "s/token=.*/token=$TG_BOT_API/g" build.sh
