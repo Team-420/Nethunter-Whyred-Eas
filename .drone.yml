@@ -39,4 +39,4 @@ steps:
     - cd source
     - git clone --depth=1 --quiet https://github.com/theradcolor/lazyscripts.git -b master
     - sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
-    - script -c "bash -x buid.sh --newcam" build.log
+    - script -c "bash -x build.sh --newcam" build.log
