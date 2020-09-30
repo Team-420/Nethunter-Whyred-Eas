@@ -13,7 +13,7 @@ steps:
   commands:
     - "export TG_BOT_API"
     - pacman -Sy base-devel bc llvm curl zip wget git --noconfirm
-    - git clone --depth=1 --quiet https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b kernel-eas source
+    - git clone --depth=1 --quiet https://github.com/Team-420/Nethunter-Whyred-Eas.git -b kernel-eas source
     - cd source
     - git clone --depth=1 --quiet https://github.com/theradcolor/lazyscripts.git -b master
     - sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
@@ -35,7 +35,7 @@ steps:
   commands:
     - "export TG_BOT_API"
     - pacman -Sy base-devel bc llvm curl zip wget git --noconfirm
-    - git clone --depth=1 --quiet https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b kernel-eas source
+    - git clone --depth=1 --quiet https://github.com/Team-420/Nethunter-Whyred-Eas.git -b kernel-eas source
     - cd source
     - git clone --depth=1 --quiet https://github.com/theradcolor/lazyscripts.git -b master
     - sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
