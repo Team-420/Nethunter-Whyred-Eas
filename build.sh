@@ -12,7 +12,7 @@ IMG=$out"/arch/arm64/boot/Image.gz-dtb"
 DATE="`date +%d%m%Y-%H%M%S`"
 grp_chat_id="-1001375712567"
 chat_id="-1001355665867"
-token="1254837116:$token"
+token="1254837116:AAEjAUEGeb3X4W8L5WqnJTDqG6I6ADyk6kI"
 
 function clone_clang()
 {

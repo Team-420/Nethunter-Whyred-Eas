@@ -10,8 +10,8 @@ jobs:
            git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b $CIRCLE_BRANCH source
            cd source
            git clone --depth=1 https://github.com/theradcolor/lazyscripts.git -b master
-           sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
-           script -c "bash -x lazyscripts/ci-scripts/ci-rad --oldcam" build.log
+           sed -i "s/token=.*/token=$TG_BOT_API/g" build.sh
+           script -c "bash -x build.sh --oldcam" build.log
   newcam:
    docker:
       - image: archlinux:latest
@@ -19,7 +19,7 @@ jobs:
       - run:
           command: |
            pacman -Sy base-devel bc llvm curl wget git --noconfirm
-           git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b $CIRCLE_BRANCH source
+           git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b kernel-eas source
            cd source
            git clone --depth=1 https://github.com/theradcolor/lazyscripts.git -b master
            sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
@@ -31,11 +31,11 @@ jobs:
       - run:
           command: |
            pacman -Sy base-devel bc llvm curl wget git --noconfirm
-           git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b $CIRCLE_BRANCH source
+           git clone --depth=1 https://github.com/theradcolor/android_kernel_xiaomi_whyred.git -b kernel-eas source
            cd source
            git clone --depth=1 https://github.com/theradcolor/lazyscripts.git -b master
-           sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-fake
-           script -c "bash -x lazyscripts/ci-scripts/ci-fakr" build.log
+           sed -i "s/token=.*/token=$TG_BOT_API/g" build.sh
+           script -c "bash -x build.sh" build.log
   nulljob:
    docker:
       - image: archlinux:latest
