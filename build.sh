@@ -148,7 +148,7 @@ function flash_zip()
     patch_anykernel
 
     # Cleanup and copy Image.gz-dtb to dir.
-    rm -f rad-ci*.zip
+    rm -f Team420-*.zip
     rm -f Image.gz-dtb
 
     # Copy Image.gz-dtb to dir.
@@ -156,7 +156,7 @@ function flash_zip()
 
     # Build a flashable zip
     zip -r9 $ZIPNAME * -x README.md .git
-    MD5=$(md5sum rad-ci-*.zip | cut -d' ' -f1)
+    MD5=$(md5sum Team420-*.zip | cut -d' ' -f1)
     tg_push
 }
 
@@ -195,7 +195,7 @@ function tg_inform()
 
 function tg_push()
 {
-    ZIP="${ANYKERNEL_DIR}"/$(echo rad-ci-*.zip)
+    ZIP="${ANYKERNEL_DIR}"/$(echo Team420-*.zip)
     curl -F document=@"${ZIP}" "https://api.telegram.org/bot${token}/sendDocument" \
       -F chat_id="$chat_id" \
       -F "disable_web_page_preview=true" \
@@ -215,7 +215,7 @@ function tg_push_log()
       -F chat_id="$grp_chat_id" \
       -F "disable_web_page_preview=true" \
       -F "parse_mode=html" \
-            -F caption="⭕️ Build took $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s). @theradcolor"
+            -F caption="⭕️ Build took $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) second(s). @S133PY"
 }
 
 function patch_anykernel()
