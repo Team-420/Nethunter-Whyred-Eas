@@ -771,13 +771,16 @@ static int __init msm_vidc_init(void)
 	mutex_init(&vidc_driver->lock);
 	vidc_driver->debugfs_root = msm_vidc_debugfs_init_drv();
 	if (!vidc_driver->debugfs_root)
+#ifdef CONFIG_DEBUG_FS
 		dprintk(VIDC_ERR,
 			"Failed to create debugfs for msm_vidc\n");
+#endif
 
 	rc = platform_driver_register(&msm_vidc_driver);
 	if (rc) {
 		dprintk(VIDC_ERR,
 			"Failed to register platform driver\n");
+		msm_vidc_debugfs_deinit_drv();
 		debugfs_remove_recursive(vidc_driver->debugfs_root);
 		kfree(vidc_driver);
 		vidc_driver = NULL;
@@ -789,6 +792,7 @@ static int __init msm_vidc_init(void)
 static void __exit msm_vidc_exit(void)
 {
 	platform_driver_unregister(&msm_vidc_driver);
+	msm_vidc_debugfs_deinit_drv();
 	debugfs_remove_recursive(vidc_driver->debugfs_root);
 	mutex_destroy(&vidc_driver->lock);
 	kfree(vidc_driver);

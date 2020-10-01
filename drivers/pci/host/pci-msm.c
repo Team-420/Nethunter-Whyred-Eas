@@ -2508,6 +2508,8 @@ int msm_pcie_debug_info(struct pci_dev *dev, u32 option, u32 base,
 		return -ENODEV;
 	}
 
+	pdev = PCIE_BUS_PRIV_DATA(dev->bus);
+
 	if (option == 12 || option == 13) {
 		if (!base || base > 5) {
 			PCIE_DBG_FS(pdev, "Invalid base_sel: 0x%x\n", base);
@@ -2534,7 +2536,6 @@ int msm_pcie_debug_info(struct pci_dev *dev, u32 option, u32 base,
 		}
 	}
 
-	pdev = PCIE_BUS_PRIV_DATA(dev->bus);
 	rc_sel = 1 << pdev->rc_idx;
 
 	msm_pcie_sel_debug_testcase(pdev, option);
@@ -6656,6 +6657,7 @@ int __init pcie_init(void)
 
 	for (i = 0; i < MAX_RC_NUM; i++) {
 		snprintf(rc_name, MAX_RC_NAME_LEN, "pcie%d-short", i);
+#ifdef CONFIG_IPC_LOGGING
 		msm_pcie_dev[i].ipc_log =
 			ipc_log_context_create(PCIE_LOG_PAGES, rc_name, 0);
 		if (msm_pcie_dev[i].ipc_log == NULL)
@@ -6685,6 +6687,7 @@ int __init pcie_init(void)
 			PCIE_DBG(&msm_pcie_dev[i],
 				"PCIe IPC logging %s is enable for RC%d\n",
 				rc_name, i);
+#endif
 		spin_lock_init(&msm_pcie_dev[i].cfg_lock);
 		msm_pcie_dev[i].cfg_access = true;
 		mutex_init(&msm_pcie_dev[i].setup_lock);
