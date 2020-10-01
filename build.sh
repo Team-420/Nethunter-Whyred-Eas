@@ -243,7 +243,7 @@ git config --global user.email "thiviyan@gmail.com"
 if [[ "$@" =~ "newcam" ]]; then
     config="whyred-nh-newcam_defconfig"
 else
-    config="whyred-nh_defconfig"
+    config="whyred_defconfig"
 fi
 # Start Build (build_clang or build_gcc)
 build_clang
