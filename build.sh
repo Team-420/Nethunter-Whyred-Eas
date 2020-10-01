@@ -121,7 +121,8 @@ function build_clang()
     BUILD_START=$(date +"%s")
 
     make -j"${KBUILD_JOBS}" O=$out CC="${TC}" LLVM_AR="${CLANG_DIR}/bin/llvm-ar" LLVM_NM="${CLANG_DIR}/bin/llvm-nm" OBJCOPY="${CLANG_DIR}/bin/llvm-objcopy" OBJDUMP="${CLANG_DIR}/bin/llvm-objdump" STRIP="${CLANG_DIR}/bin/llvm-strip" CROSS_COMPILE="${GCC64}" CROSS_COMPILE_ARM32="${GCC32}" CLANG_TRIPLE="${GCC64_TYPE}" 2>&1| tee $out/build.log
-
+    make -j"${KBUILD_JOBS}" O=$out CC="${TC}" LLVM_AR="${CLANG_DIR}/bin/llvm-ar" LLVM_NM="${CLANG_DIR}/bin/llvm-nm" OBJCOPY="${CLANG_DIR}/bin/llvm-objcopy" OBJDUMP="${CLANG_DIR}/bin/llvm-objdump" STRIP="${CLANG_DIR}/bin/llvm-strip" CROSS_COMPILE="${GCC64}" CROSS_COMPILE_ARM32="${GCC32}" CLANG_TRIPLE="${GCC64_TYPE}" modules_install INSTALL_MOD_PATH=modules_out 
+    
     BUILD_END=$(date +"%s")
     DIFF=$(($BUILD_END - $BUILD_START))
 
@@ -150,6 +151,9 @@ function flash_zip()
     # Cleanup and copy Image.gz-dtb to dir.
     rm -f Team420-*.zip
     rm -f Image.gz-dtb
+    cp -r $out/modules_out/* $ANYKERNEL_DIR/modules/
+    rm $ANYKERNEL_DIR/modules/lib/modules/*/source
+    rm $ANYKERNEL_DIR/modules/lib/modules/*/build
 
     # Copy Image.gz-dtb to dir.
     cp $out/arch/arm64/boot/Image.gz-dtb ${ANYKERNEL_DIR}/
