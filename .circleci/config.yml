@@ -22,8 +22,8 @@ jobs:
            git clone --depth=1 hhttps://github.com/Team-420/Nethunter-Whyred-Eas.git -b kernel-eas source
            cd source
            git clone --depth=1 https://github.com/theradcolor/lazyscripts.git -b master
-           sed -i "s/token=.*/token=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
-           script -c "bash -x lazyscripts/ci-scripts/ci-rad --newcam" build.log
+           sed -i "s/BOT_TOKEN=.*/BOT_TOKEN=$TG_BOT_API/g" lazyscripts/ci-scripts/ci-rad
+           script -c "bash -x lazyscripts/ci-scripts/ci-rad --newcam --gcc" build.log
   fakejob:
    docker:
       - image: archlinux:latest
