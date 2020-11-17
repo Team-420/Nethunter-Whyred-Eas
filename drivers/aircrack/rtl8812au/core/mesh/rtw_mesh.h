@@ -106,7 +106,6 @@ extern const char *_rtw_mesh_ps_str[];
 #define RTW_PREQ_Q_F_REFRESH	0x2
 #define RTW_PREQ_Q_F_CHK	0x4
 #define RTW_PREQ_Q_F_PEER_AKA	0x8
-#define RTW_PREQ_Q_F_BCAST_PREQ	0x10 /* force path_dicover using broadcast */
 struct rtw_mesh_preq_queue {
 	_list list;
 	u8 dst[ETH_ALEN];
@@ -392,7 +391,7 @@ struct rtw_mesh_info {
 
 	_queue mpath_tx_queue;
 	u32 mpath_tx_queue_len;
-	_tasklet mpath_tx_tasklet;
+	struct tasklet_struct mpath_tx_tasklet;
 
 	struct rtw_mrc *mrc;
 

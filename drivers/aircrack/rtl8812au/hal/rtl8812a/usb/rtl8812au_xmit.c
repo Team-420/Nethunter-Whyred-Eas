@@ -60,6 +60,7 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz , u8 ba
 #endif/*CONFIG_80211N_HT*/
 	u8 vht_max_ampdu_size = 0;
 	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(padapter);
+	struct registry_priv	*pregpriv = &(padapter->registrypriv);
 
 #ifndef CONFIG_USE_USB_BUFFER_ALLOC_TX
 	if (padapter->registrypriv.mp_mode == 0) {
@@ -115,10 +116,16 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz , u8 ba
 
 	/* offset 12 */
 
-	if (!pattrib->qos_en) {
+	if (pattrib->injected == _TRUE && !pregpriv->monitor_overwrite_seqnum) {
+		/* Prevent sequence number from being overwritten */
+		SET_TX_DESC_HWSEQ_EN_8812(ptxdesc, 0); /* Hw do not set sequence number */
+		SET_TX_DESC_SEQ_8812(ptxdesc, pattrib->seqnum); /* Copy inject sequence number to TxDesc */
+	}
+	else if (!pattrib->qos_en) {
 		SET_TX_DESC_HWSEQ_EN_8812(ptxdesc, 1); /* Hw set sequence number */
-	} else
+	} else {
 		SET_TX_DESC_SEQ_8812(ptxdesc, pattrib->seqnum);
+	}
 
 	if ((pxmitframe->frame_tag & 0x0f) == DATA_FRAMETAG) {
 		/* RTW_INFO("pxmitframe->frame_tag == DATA_FRAMETAG\n");		 */
@@ -126,7 +133,7 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz , u8 ba
 		rtl8812a_fill_txdesc_sectype(pattrib, ptxdesc);
 #if defined(CONFIG_CONCURRENT_MODE)
 		if (bmcst)
-			rtl8812a_fill_txdesc_force_bmc_camid(pattrib, ptxdesc);
+			fill_txdesc_force_bmc_camid(pattrib, ptxdesc);
 #endif
 
 		/* offset 20 */
@@ -214,7 +221,7 @@ static s32 update_txdesc(struct xmit_frame *pxmitframe, u8 *pmem, s32 sz , u8 ba
 				SET_TX_DESC_TX_RATE_8812(ptxdesc, (pHalData->INIDATA_RATE[pattrib->mac_id] & 0x7F));
 			}
 			if (bmcst)
-				rtl8812a_fill_txdesc_bmc_tx_rate(pattrib, ptxdesc);
+				fill_txdesc_bmc_tx_rate(pattrib, ptxdesc);
 
 			if (padapter->fix_rate != 0xFF) { /* modify data rate by iwpriv */
 				SET_TX_DESC_USE_RATE_8812(ptxdesc, 1);

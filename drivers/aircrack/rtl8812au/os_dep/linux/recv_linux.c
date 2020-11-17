@@ -702,6 +702,7 @@ int rtw_recv_indicatepkt(_adapter *padapter, union recv_frame *precv_frame)
 
 	rtw_os_recv_indicate_pkt(padapter, precv_frame->u.hdr.pkt, precv_frame);
 
+_recv_indicatepkt_end:
 	precv_frame->u.hdr.pkt = NULL;
 	rtw_free_recvframe(precv_frame, pfree_recv_queue);
 	return _SUCCESS;
@@ -714,8 +715,9 @@ _recv_indicatepkt_drop:
 
 void rtw_os_read_port(_adapter *padapter, struct recv_buf *precvbuf)
 {
-#ifdef CONFIG_USB_HCI
 	struct recv_priv *precvpriv = &padapter->recvpriv;
+
+#ifdef CONFIG_USB_HCI
 
 	precvbuf->ref_cnt--;
 

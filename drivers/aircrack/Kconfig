@@ -8,3 +8,4 @@ source "drivers/aircrack/rtl8812au/Kconfig"
 
 source "drivers/aircrack/rtl8192eu/Kconfig"
 
+source "drivers/aircrack/rtl8814au/Kconfig"
