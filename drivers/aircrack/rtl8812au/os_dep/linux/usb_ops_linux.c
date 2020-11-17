@@ -38,7 +38,7 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 	u8 *pIo_buf;
 	int vendorreq_times = 0;
 
-#if (defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)) || defined(CONFIG_RTL8822C)
+#if (defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C))
 #define REG_ON_SEC 0x00
 #define REG_OFF_SEC 0x01
 #define REG_LOCAL_SEC 0x02
@@ -115,25 +115,8 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 				_rtw_memcpy(pdata, pIo_buf,  len);
 			}
 		} else { /* error cases */
-			switch (len) {
-				case 1:
-					RTW_INFO("reg 0x%x, usb %s %u fail, status:%d value=0x%x, vendorreq_times:%d\n"
-						, value, (requesttype == 0x01) ? "read" : "write" , len, status, *(u8 *)pdata, vendorreq_times);
-				break;
-				case 2:
-					RTW_INFO("reg 0x%x, usb %s %u fail, status:%d value=0x%x, vendorreq_times:%d\n"
-						, value, (requesttype == 0x01) ? "read" : "write" , len, status, *(u16 *)pdata, vendorreq_times);
-				break;
-				case 4:
-					RTW_INFO("reg 0x%x, usb %s %u fail, status:%d value=0x%x, vendorreq_times:%d\n"
-						, value, (requesttype == 0x01) ? "read" : "write" , len, status, *(u32 *)pdata, vendorreq_times);
-				break;
-				default:
-					RTW_INFO("reg 0x%x, usb %s %u fail, status:%d, vendorreq_times:%d\n"
-						, value, (requesttype == 0x01) ? "read" : "write" , len, status, vendorreq_times);
-				break;
-				
-			}
+			RTW_INFO("reg 0x%x, usb %s %u fail, status:%d value=0x%x, vendorreq_times:%d\n"
+				, value, (requesttype == 0x01) ? "read" : "write" , len, status, *(u32 *)pdata, vendorreq_times);
 
 			if (status < 0) {
 				if (status == (-ESHUTDOWN)	|| status == -ENODEV)
@@ -168,9 +151,9 @@ int usbctrl_vendorreq(struct intf_hdl *pintfhdl, u8 request, u16 value, u16 inde
 
 	}
 
-#if (defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)) || defined(CONFIG_RTL8822C)
+#if (defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C))
 	if (value < 0xFE00) {
-		if (value <= 0xff)
+		if (0x00 <= value && value <= 0xff)
 			current_reg_sec = REG_ON_SEC;
 		else if (0x1000 <= value && value <= 0x10ff)
 			current_reg_sec = REG_ON_SEC;
@@ -295,8 +278,7 @@ unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr)
 
 #ifdef RTW_HALMAC
          /* halmac already translate queue id to bulk out id (addr 0~3) */
-		 /* 8814BU bulk out id range is 0~6 */
-        else if (addr < MAX_BULKOUT_NUM) {
+        else if (addr < 4) {
                 ep_num = pdvobj->RtOutPipe[addr];
                 pipe = usb_sndbulkpipe(pusbd, ep_num);
         }
@@ -317,7 +299,7 @@ struct zero_bulkout_context {
 	void *pirp;
 	void *padapter;
 };
-#if 0
+
 static void usb_bulkout_zero_complete(struct urb *purb, struct pt_regs *regs)
 {
 	struct zero_bulkout_context *pcontext = (struct zero_bulkout_context *)purb->context;
@@ -393,7 +375,7 @@ static u32 usb_bulkout_zero(struct intf_hdl *pintfhdl, u32 addr)
 	return _SUCCESS;
 
 }
-#endif
+
 void usb_read_mem(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem)
 {
 
@@ -647,6 +629,9 @@ u32 usb_write_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *wmem)
 	purb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 	purb->transfer_flags |= URB_ZERO_PACKET;
 #endif /* CONFIG_USE_USB_BUFFER_ALLOC_TX */
+
+#ifdef USB_PACKET_OFFSET_SZ
+#endif
 
 #if 0
 	if (bwritezero)

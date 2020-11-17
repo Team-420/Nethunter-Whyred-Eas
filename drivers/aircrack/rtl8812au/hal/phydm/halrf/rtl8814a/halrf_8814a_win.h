@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
@@ -11,118 +11,96 @@
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
- *****************************************************************************/
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
-#ifndef __HALRF_8814A_H__
-#define __HALRF_8814A_H__
-
-#if (RTL8814A_SUPPORT == 1)
-
+#ifndef __HAL_PHY_RF_8814A_H__
+#define __HAL_PHY_RF_8814A_H__
 
 /*--------------------------Define Parameters-------------------------------*/
 #define AVG_THERMAL_NUM_8814A	4
 
-#include "halrf/halphyrf_win.h"
+#include "halphyrf_win.h"
 
-void configure_txpower_track_8814a(
-	struct txpwrtrack_cfg	*config
-);
+void ConfigureTxpowerTrack_8814A(
+	PTXPWRTRACK_CFG	pConfig
+	);
 
-void get_delta_swing_table_8814a(
-	void		*dm_void,
-	u8 **temperature_up_a,
-	u8 **temperature_down_a,
-	u8 **temperature_up_b,
-	u8 **temperature_down_b
-);
+VOID
+GetDeltaSwingTable_8814A(
+	IN 	PDM_ODM_T			pDM_Odm,
+	OUT pu1Byte 			*TemperatureUP_A,
+	OUT pu1Byte 			*TemperatureDOWN_A,
+	OUT pu1Byte 			*TemperatureUP_B,
+	OUT pu1Byte 			*TemperatureDOWN_B	
+	);
 
-
-void
-get_delta_swing_table_8814a_path_cd(
-	void		*dm_void,
-	u8 **temperature_up_c,
-	u8 **temperature_down_c,
-	u8 **temperature_up_d,
-	u8 **temperature_down_d
-);
-
-
-void
-odm_tx_pwr_track_set_pwr8814a(
-	void		*dm_void,
-	enum pwrtrack_method	method,
-	u8				rf_path,
-	u8				channel_mapped_index
-);
-
-#if 0
-u8
-check_rf_gain_offset(
-	struct dm_struct			*dm,
-	enum pwrtrack_method			method,
-	u8				rf_path
-);
-#endif
-
-u8
-get_tssivalue(
-	struct dm_struct			*dm,
-	enum pwrtrack_method	method,
-	u8					rf_path
-);
-
-boolean
-get_tssi_mode_tx_agc_bb_swing_offset(
-	struct dm_struct			*dm,
-	enum pwrtrack_method	method,
-	u8					rf_path,
-	u32					offset_vaule,
-	u8					tx_power_index_offest
-);
+VOID
+GetDeltaSwingTable_8814A_PathCD(
+	IN 	PDM_ODM_T			pDM_Odm,
+	OUT pu1Byte 			*TemperatureUP_C,
+	OUT pu1Byte 			*TemperatureDOWN_C,
+	OUT pu1Byte 			*TemperatureUP_D,
+	OUT pu1Byte 			*TemperatureDOWN_D	
+	);
 
 
-void
-power_tracking_by_mix_mode(
-	struct dm_struct			*dm,
-	enum pwrtrack_method	method,
-	u8				rf_path
-);
+VOID
+ODM_TxPwrTrackSetPwr8814A(
+	PDM_ODM_T			pDM_Odm,
+	PWRTRACK_METHOD 	Method,
+	u1Byte 				RFPath,
+	u1Byte 				ChannelMappedIndex
+	);
 
-void
-power_tracking_by_tssi_mode(
-	struct dm_struct			*dm,
-	enum pwrtrack_method	method,
-	u8				rf_path
-);
+u1Byte
+CheckRFGainOffset(
+	PDM_ODM_T			pDM_Odm,
+	u1Byte				RFPath
+	);
 
 
-/*
- * LC calibrate
- *   */
-void
-phy_lc_calibrate_8814a(
-	void		*dm_void
-);
+//
+// LC calibrate
+//
+void	
+PHY_LCCalibrate_8814A(
+	IN PDM_ODM_T		pDM_Odm
+	);
 
-void 
-phy_dp_calibrate_8814a(
-	struct dm_struct	*dm
-);
-
-void phy_set_rf_path_switch_8814a(
+//
+// AP calibrate
+//
+void	
+PHY_APCalibrate_8814A(		
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct dm_struct		*dm,
+	IN PDM_ODM_T		pDM_Odm,
 #else
-	void	*adapter,
+	IN	PADAPTER	pAdapter,
 #endif
-	boolean		is_main
-);
+	IN 	s1Byte		delta
+	);
 
 
-#else	/* (RTL8814A_SUPPORT == 0)*/
+VOID	                                                 
+PHY_DPCalibrate_8814A(                                   
+	IN 	PDM_ODM_T	pDM_Odm                             
+	);
 
-#define phy_lc_calibrate_8814a(_pdm_odm)			false
 
-#endif	/* RTL8814A_SUPPORT */
+VOID PHY_SetRFPathSwitch_8814A(
+#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
+	IN PDM_ODM_T		pDM_Odm,
+#else
+	IN	PADAPTER	pAdapter,
+#endif
+	IN	BOOLEAN		bMain
+	);
 
-#endif	/*#ifndef __HALRF_8814A_WIN_H__*/
+								
+#endif	// #ifndef __HAL_PHY_RF_8188E_H__								
+

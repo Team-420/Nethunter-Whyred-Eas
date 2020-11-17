@@ -33,9 +33,6 @@
 
 #define PLATFORM_LINUX
 
-
-#define CONFIG_IOCTL_CFG80211 1
-
 #ifdef CONFIG_IOCTL_CFG80211
 	/* #define RTW_USE_CFG80211_STA_EVENT */ /* Indecate new sta asoc through cfg80211_new_sta */
 	#define CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER
@@ -56,12 +53,13 @@
 #endif
 /* #define CONFIG_FILE_FWIMG */
 
-/* #define CONFIG_XMIT_ACK */
-//#ifdef CONFIG_XMIT_ACK
-	#define CONFIG_ACTIVE_KEEP_ALIVE_CHECK
-//#endif
+#define CONFIG_XMIT_ACK
+#ifdef CONFIG_XMIT_ACK
+	//#define CONFIG_ACTIVE_KEEP_ALIVE_CHECK
+#endif
 
 #define CONFIG_80211N_HT
+
 #define CONFIG_80211AC_VHT
 #ifdef CONFIG_80211AC_VHT
 	#ifndef CONFIG_80211N_HT
@@ -71,13 +69,22 @@
 
 #ifdef CONFIG_80211AC_VHT
 	#define CONFIG_BEAMFORMING
+
+	#ifdef CONFIG_BEAMFORMING
+		#define CONFIG_BEAMFORMER_FW_NDPA
+		#define CONFIG_PHYDM_BEAMFORMING
+		#ifdef CONFIG_PHYDM_BEAMFORMING
+		#define BEAMFORMING_SUPPORT		1	/*for phydm beamforming*/
+		#define SUPPORT_MU_BF				0
+		#else
+		#define BEAMFORMING_SUPPORT		0	/*for driver beamforming*/
+		#endif
+	#endif
+
 #endif
 
 #define CONFIG_RECV_REORDERING_CTRL	1
 
-#define CONFIG_RF_POWER_TRIM
-
-//#define CONFIG_DFS	1
 #define CONFIG_DFS	0
 
  /* #define CONFIG_SUPPORT_USB_INT */
@@ -86,29 +93,41 @@
 #endif
 
 #ifdef CONFIG_POWER_SAVING
-	//#define CONFIG_IPS	1 //jimmy, do not always try to enter power save mode when no connected!!
+	#define CONFIG_IPS	1
 	#ifdef CONFIG_IPS
 	/* #define CONFIG_IPS_LEVEL_2	1 */ /* enable this to set default IPS mode to IPS_LEVEL_2	 */
 	#define CONFIG_IPS_CHECK_IN_WD /* Do IPS Check in WatchDog.	 */
+	#ifdef CONFIG_PNO_SUPPORT
+		#define CONFIG_FWLPS_IN_IPS /* issue H2C command to let FW do LPS when entering IPS */
+	#endif /* CONFIG_PNO_SUPPORT */
 	#endif
 	/* #define SUPPORT_HW_RFOFF_DETECTED	1 */
 
-	#define CONFIG_LPS	0
-	#if defined(CONFIG_LPS) && defined(CONFIG_SUPPORT_USB_INT)
-	/* #define CONFIG_LPS_LCLK	1 */
+	#define CONFIG_LPS	1
+	#if defined(CONFIG_LPS)
+		/* #define CONFIG_LPS_LCLK	1 */
 	#endif
 
 	#ifdef CONFIG_LPS_LCLK
-	/* #define CONFIG_XMIT_THREAD_MODE */
-	#endif
+		#ifdef CONFIG_POWER_SAVING
+			/* #define CONFIG_XMIT_THREAD_MODE */
+		#endif /* CONFIG_POWER_SAVING */
+		#ifndef CONFIG_SUPPORT_USB_INT
+			#define LPS_RPWM_WAIT_MS 300
+			#define CONFIG_DETECT_CPWM_BY_POLLING
+		#endif /* !CONFIG_SUPPORT_USB_INT */
+		/* #define DBG_CHECK_FW_PS_STATE */
+	#endif /* CONFIG_LPS_LCLK */
 #endif /*CONFIG_POWER_SAVING*/
 	/*#define CONFIG_ANTENNA_DIVERSITY*/
+
+
 
 	/* #define CONFIG_CONCURRENT_MODE 1 */
 	#ifdef CONFIG_CONCURRENT_MODE
 		#define CONFIG_RUNTIME_PORT_SWITCH
-		/* #define DBG_RUNTIME_PORT_SWITCH */
 
+		/* #define DBG_RUNTIME_PORT_SWITCH */
 		/* #ifdef CONFIG_RTL8812A */
 		/*	#define CONFIG_TSF_RESET_OFFLOAD 1 */		/* For 2 PORT TSF SYNC. */
 		/* #endif */
@@ -136,6 +155,7 @@
 	#define CONFIG_FIND_BEST_CHANNEL	1
 #endif
 
+#define CONFIG_P2P	1
 #ifdef CONFIG_P2P
 	/* The CONFIG_WFD is for supporting the Wi-Fi display */
 	#define CONFIG_WFD
@@ -158,7 +178,7 @@
 /*	#endif */
 /*	#define CONFIG_TDLS_AUTOSETUP */
 	#define CONFIG_TDLS_AUTOCHECKALIVE
-	/* #define CONFIG_TDLS_CH_SW */	/* Enable this flag only when we confirm that TDLS CH SW is supported in FW */
+	#define CONFIG_TDLS_CH_SW	/* Enable this flag only when we confirm that TDLS CH SW is supported in FW */
 #endif
 
 #define CONFIG_SKB_COPY	1 /* for amsdu */
@@ -185,6 +205,9 @@
 /* #define CONFIG_BACKGROUND_NOISE_MONITOR */
 #endif
 #define RTW_NOTCH_FILTER 0 /* 0:Disable, 1:Enable, */
+
+#define CONFIG_TX_MCAST2UNI		/*Support IP multicast->unicast*/
+/* #define CONFIG_CHECK_AC_LIFETIME 1 */	/* Check packet lifetime of 4 ACs. */
 
 
 /*
@@ -226,13 +249,13 @@
 /* #define CONFIG_USB_SUPPORT_ASYNC_VDN_REQ 1 */
 
 #ifdef CONFIG_WOWLAN
-	/* #define CONFIG_GTK_OL */
+	#define CONFIG_GTK_OL
 	/* #define CONFIG_ARP_KEEP_ALIVE */
 #endif /* CONFIG_WOWLAN */
 
 #ifdef CONFIG_GPIO_WAKEUP
 	#ifndef WAKEUP_GPIO_IDX
-#define WAKEUP_GPIO_IDX	8	/* WIFI Chip Side */
+#define WAKEUP_GPIO_IDX	1	/* WIFI Chip Side */
 	#endif /* !WAKEUP_GPIO_IDX */
 #endif /* CONFIG_GPIO_WAKEUP */
 
@@ -304,6 +327,8 @@
  */
 #define DBG	0
 
+#define CONFIG_PROC_DEBUG
+
 #define DBG_CONFIG_ERROR_DETECT
 /* #define DBG_CONFIG_ERROR_DETECT_INT */
 /* #define DBG_CONFIG_ERROR_RESET */
@@ -323,6 +348,10 @@
 /* #define DBG_RX_SIGNAL_DISPLAY_PROCESSING */
 /* #define DBG_RX_SIGNAL_DISPLAY_SSID_MONITORED "jeff-ap" */
 
+#define DBG_TX_POWER_IDX 1
+#define DBG_PG_TXPWR_READ 1
+#define DBG_HIGHEST_RATE_BMP_BW_CHANGE 1
+
 /* #define DBG_SHOW_MCUFWDL_BEFORE_51_ENABLE */
 /* #define DBG_ROAMING_TEST */
 
@@ -330,4 +359,5 @@
 
 /*#define DBG_MEMORY_LEAK*/
 #define	DBG_RX_DFRAME_RAW_DATA
-/*#define CONFIG_FW_C2H_DEBUG */
+/*#define CONFIG_USE_EXTERNAL_POWER  */        /* NOT USB2.0 power, so no 500mA power constraint, no limitation in Power by Rate*/
+/*#define DBG_FW_DEBUG_MSG_PKT*/ /* FW use this feature to tx debug broadcast pkt. This pkt include FW debug message*/

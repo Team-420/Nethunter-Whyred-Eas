@@ -1319,8 +1319,6 @@ void rtw_mesh_queue_preq(struct rtw_mesh_path *path, u8 flags)
 #endif
 	if (flags & RTW_PREQ_Q_F_PEER_AKA)
 		path->flags |= RTW_MESH_PATH_PEER_AKA;
-	if (flags & RTW_PREQ_Q_F_BCAST_PREQ)
-		path->flags |= RTW_MESH_PATH_BCAST_PREQ;
 	_rtw_spinunlock(&path->state_lock);
 
 	rtw_list_insert_tail(&preq_node->list, &minfo->preq_queue.list);
@@ -1340,15 +1338,12 @@ void rtw_mesh_queue_preq(struct rtw_mesh_path *path, u8 flags)
 }
 
 static const u8 *rtw_hwmp_preq_da(struct rtw_mesh_path *path,
-			    BOOLEAN is_root_add_chk, BOOLEAN da_is_peer,
-			    BOOLEAN force_preq_bcast)
+			    BOOLEAN is_root_add_chk, BOOLEAN da_is_peer)
 {
 	const u8 *da;
 
 	if (da_is_peer)
 		da = path->dst;
-	else if (force_preq_bcast)
-		da = bcast_addr;
 	else if (path->is_root)
 #ifdef CONFIG_RTW_MESH_ADD_ROOT_CHK
 		da = is_root_add_chk ? path->add_chk_rann_snd_addr:
@@ -1373,7 +1368,7 @@ void rtw_mesh_path_start_discovery(_adapter *adapter)
 	u32 lifetime;
 	u8 flags = 0;
 	BOOLEAN is_root_add_chk = _FALSE;
-	BOOLEAN da_is_peer, force_preq_bcast;
+	BOOLEAN da_is_peer;
 
 	enter_critical_bh(&minfo->mesh_preq_queue_lock);
 	if (!minfo->preq_queue_len ||
@@ -1442,11 +1437,9 @@ void rtw_mesh_path_start_discovery(_adapter *adapter)
 	is_root_add_chk = !!(path->flags & RTW_MESH_PATH_ROOT_ADD_CHK);
 #endif
 	da_is_peer = !!(path->flags & RTW_MESH_PATH_PEER_AKA);
-	force_preq_bcast = !!(path->flags & RTW_MESH_PATH_BCAST_PREQ);
 	exit_critical_bh(&path->state_lock);
 
-	da = rtw_hwmp_preq_da(path, is_root_add_chk,
-			      da_is_peer, force_preq_bcast);
+	da = rtw_hwmp_preq_da(path, is_root_add_chk, da_is_peer);
 
 #ifdef CONFIG_RTW_MESH_ON_DMD_GANN
 	flags = (mshcfg->dot11MeshGateAnnouncementProtocol)
@@ -1482,8 +1475,7 @@ void rtw_mesh_path_timer(void *ctx)
 		path->flags &= ~(RTW_MESH_PATH_RESOLVING |
 				 RTW_MESH_PATH_RESOLVED |
 				 RTW_MESH_PATH_ROOT_ADD_CHK |
-				 RTW_MESH_PATH_PEER_AKA |
-				 RTW_MESH_PATH_BCAST_PREQ);
+				 RTW_MESH_PATH_PEER_AKA);
 		exit_critical_bh(&path->state_lock);
 	} else if (path->discovery_retries < rtw_max_preq_retries(adapter)) {
 		++path->discovery_retries;
@@ -1503,8 +1495,7 @@ void rtw_mesh_path_timer(void *ctx)
 				  RTW_MESH_PATH_RESOLVED |
 				  RTW_MESH_PATH_REQ_QUEUED |
 				  RTW_MESH_PATH_ROOT_ADD_CHK |
-				  RTW_MESH_PATH_PEER_AKA |
-				  RTW_MESH_PATH_BCAST_PREQ);
+				  RTW_MESH_PATH_PEER_AKA);
 		path->exp_time = rtw_get_current_time();
 		exit_critical_bh(&path->state_lock);
 		if (!path->is_gate && rtw_mesh_gate_num(adapter) > 0) {

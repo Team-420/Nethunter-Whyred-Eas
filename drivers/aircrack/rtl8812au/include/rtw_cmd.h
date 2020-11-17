@@ -18,13 +18,19 @@
 
 #define C2H_MEM_SZ (16*1024)
 
+#ifndef CONFIG_RTL8711FW
+
 #define FREE_CMDOBJ_SZ	128
 
 #define MAX_CMDSZ	1024
 #define MAX_RSPSZ	512
 #define MAX_EVTSZ	1024
 
-#define CMDBUFF_ALIGN_SZ 512
+#ifdef PLATFORM_OS_CE
+	#define CMDBUFF_ALIGN_SZ 4
+#else
+	#define CMDBUFF_ALIGN_SZ 512
+#endif
 
 struct cmd_obj {
 	_adapter *padapter;
@@ -108,6 +114,9 @@ struct	evt_priv {
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	u8	*c2h_mem;
 	u8	*allocated_c2h_mem;
+#ifdef PLATFORM_OS_XP
+	PMDL	pc2h_mdl;
+#endif
 #endif
 
 };
@@ -215,6 +224,10 @@ struct mgnt_tx_parm {
 };
 #endif
 
+#else
+/* #include <ieee80211.h> */
+#endif	/* CONFIG_RTL8711FW */
+
 enum rtw_drvextra_cmd_id {
 	NONE_WK_CID,
 	STA_MSTATUS_RPT_WK_CID,
@@ -227,6 +240,7 @@ enum rtw_drvextra_cmd_id {
 	P2P_PS_WK_CID,
 	P2P_PROTO_WK_CID,
 	CHECK_HIQ_WK_CID,/* for softap mode, check hi queue if empty */
+	INTEl_WIDI_WK_CID,
 	C2H_WK_CID,
 	RTP_TIMER_CFG_WK_CID,
 	RESET_SECURITYPRIV, /* add for CONFIG_IEEE80211W, none 11w also can use */
@@ -236,7 +250,6 @@ enum rtw_drvextra_cmd_id {
 	BEAMFORMING_WK_CID,
 	LPS_CHANGE_DTIM_CID,
 	BTINFO_WK_CID,
-	BTC_REDUCE_WL_TXPWR_CID,
 	DFS_RADAR_DETECT_WK_CID,
 	DFS_RADAR_DETECT_EN_DEC_WK_CID,
 	SESSION_TRACKER_WK_CID,
@@ -249,12 +262,14 @@ enum rtw_drvextra_cmd_id {
 	RSON_SCAN_WK_CID,
 #endif
 	MGNT_TX_WK_CID,
+#ifdef CONFIG_MCC_MODE
+	MCC_SET_DURATION_WK_CID,
+#endif /* CONFIG_MCC_MODE */
 	REQ_PER_CMD_WK_CID,
 	SSMPS_WK_CID,
 #ifdef CONFIG_CTRL_TXSS_BY_TP
 	TXSS_WK_CID,
 #endif
-	AC_PARM_CMD_WK_CID,
 #ifdef CONFIG_AP_MODE
 	STOP_AP_WK_CID,
 #endif
@@ -273,7 +288,6 @@ enum LPS_CTRL_TYPE {
 	LPS_CTRL_RX_TRAFFIC_LEAVE = 8,
 	LPS_CTRL_ENTER = 9,
 	LPS_CTRL_LEAVE_CFG80211_PWRMGMT = 10,
-	LPS_CTRL_LEAVE_SET_OPTION = 11,
 };
 
 enum STAKEY_TYPE {
@@ -959,7 +973,7 @@ struct SetChannelPlan_param {
 
 /*H2C Handler index: 60 */
 struct LedBlink_param {
-	void *pLed;
+	PVOID	 pLed;
 };
 
 /*H2C Handler index: 62 */
@@ -1053,11 +1067,7 @@ extern u8 rtw_reset_securitypriv_cmd(_adapter *padapter);
 extern u8 rtw_free_assoc_resources_cmd(_adapter *padapter, u8 lock_scanned_queue, int flags);
 extern u8 rtw_dynamic_chk_wk_cmd(_adapter *adapter);
 
-u8 rtw_lps_ctrl_wk_cmd(_adapter *padapter, u8 lps_ctrl_type, u8 flags);
-u8 rtw_lps_ctrl_leave_set_level_cmd(_adapter *adapter, u8 lps_level, u8 flags);
-#ifdef CONFIG_LPS_1T1R
-u8 rtw_lps_ctrl_leave_set_1t1r_cmd(_adapter *adapter, u8 lps_1t1r, u8 flags);
-#endif
+u8 rtw_lps_ctrl_wk_cmd(_adapter *padapter, u8 lps_ctrl_type, u8 enqueue);
 u8 rtw_dm_in_lps_wk_cmd(_adapter *padapter);
 u8 rtw_lps_change_dtim_cmd(_adapter *padapter, u8 dtim);
 
@@ -1089,7 +1099,6 @@ u8 rtw_dfs_rd_en_decision_cmd(_adapter *adapter);
 
 #ifdef CONFIG_BT_COEXIST
 u8 rtw_btinfo_cmd(PADAPTER padapter, u8 *pbuf, u16 length);
-u8 rtw_btc_reduce_wl_txpwr_cmd(_adapter *adapter, u32 val);
 #endif
 
 u8 rtw_test_h2c_cmd(_adapter *adapter, u8 *buf, u8 len);
@@ -1102,7 +1111,7 @@ u8 rtw_set_chbw_cmd(_adapter *padapter, u8 ch, u8 bw, u8 ch_offset, u8 flags);
 u8 rtw_set_chplan_cmd(_adapter *adapter, int flags, u8 chplan, u8 swconfig);
 u8 rtw_set_country_cmd(_adapter *adapter, int flags, const char *country_code, u8 swconfig);
 
-extern u8 rtw_led_blink_cmd(_adapter *padapter, void *pLed);
+extern u8 rtw_led_blink_cmd(_adapter *padapter, PVOID pLed);
 extern u8 rtw_set_csa_cmd(_adapter *adapter);
 extern u8 rtw_tdls_cmd(_adapter *padapter, u8 *addr, u8 option);
 
@@ -1138,8 +1147,6 @@ u8 session_tracker_chk_cmd(_adapter *adapter, struct sta_info *sta);
 u8 session_tracker_add_cmd(_adapter *adapter, struct sta_info *sta, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port);
 u8 session_tracker_del_cmd(_adapter *adapter, struct sta_info *sta, u8 *local_naddr, u8 *local_port, u8 *remote_naddr, u8 *remote_port);
 
-u8 set_txq_params_cmd(_adapter *adapter, u32 ac_parm, u8 ac_type);
-
 #if defined(CONFIG_RTW_MESH) && defined(RTW_PER_CMD_SUPPORT_FW)
 u8 rtw_req_per_cmd(_adapter * adapter);
 #endif
@@ -1147,15 +1154,15 @@ u8 rtw_req_per_cmd(_adapter * adapter);
 #ifdef CONFIG_CTRL_TXSS_BY_TP
 struct txss_cmd_parm {
 	struct sta_info *sta;
-	bool tx_1ss;
+	u8 tx_1ss;
 };
 
 void rtw_ctrl_txss_update_mimo_type(_adapter *adapter, struct sta_info *sta);
-u8 rtw_ctrl_txss(_adapter *adapter, struct sta_info *sta, bool tx_1ss);
+u8 rtw_ctrl_txss(_adapter *adapter, struct sta_info *sta, u8 tx_1ss);
 void rtw_ctrl_tx_ss_by_tp(_adapter *adapter, u8 from_timer);
 
 #ifdef DBG_CTRL_TXSS
-void dbg_ctrl_txss(_adapter *adapter, bool tx_1ss);
+void dbg_ctrl_txss(_adapter *adapter, u8 tx_1ss);
 #endif
 #endif
 

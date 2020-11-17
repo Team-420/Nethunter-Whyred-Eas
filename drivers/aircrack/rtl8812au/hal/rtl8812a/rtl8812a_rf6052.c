@@ -32,10 +32,10 @@
  *
  * Note:		For RF type 0222D
  *---------------------------------------------------------------------------*/
-void
+VOID
 PHY_RF6052SetBandwidth8812(
-	PADAPTER				Adapter,
-	enum channel_width		Bandwidth)	/* 20M or 40M */
+	IN	PADAPTER				Adapter,
+	IN	enum channel_width		Bandwidth)	/* 20M or 40M */
 {
 	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(Adapter);
 
@@ -66,7 +66,7 @@ PHY_RF6052SetBandwidth8812(
 
 static int
 phy_RF6052_Config_ParaFile_8812(
-	PADAPTER		Adapter
+	IN	PADAPTER		Adapter
 )
 {
 	enum rf_path			eRFPath;
@@ -134,7 +134,7 @@ phy_RF6052_Config_ParaFile_Fail:
 
 int
 PHY_RF6052_Config_8812(
-	PADAPTER		Adapter)
+	IN	PADAPTER		Adapter)
 {
 	HAL_DATA_TYPE		*pHalData = GET_HAL_DATA(Adapter);
 	int					rtStatus = _SUCCESS;

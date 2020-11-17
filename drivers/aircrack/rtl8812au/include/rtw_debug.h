@@ -32,7 +32,20 @@ enum {
 extern void rtl871x_cedbg(const char *fmt, ...);
 #endif
 
-#ifdef PLATFORM_LINUX
+#ifdef PLATFORM_WINDOWS
+	#define RTW_PRINT do {} while (0)
+	#define RTW_ERR do {} while (0)
+	#define RTW_WARN do {} while (0)
+	#define RTW_INFO do {} while (0)
+	#define RTW_DBG do {} while (0)
+	#define RTW_PRINT_SEL do {} while (0)
+	#define _RTW_PRINT do {} while (0)
+	#define _RTW_ERR do {} while (0)
+	#define _RTW_WARN do {} while (0)
+	#define _RTW_INFO do {} while (0)
+	#define _RTW_DBG do {} while (0)
+	#define _RTW_PRINT_SEL do {} while (0)
+#else
 	#define RTW_PRINT(x, ...) do {} while (0)
 	#define RTW_ERR(x, ...) do {} while (0)
 	#define RTW_WARN(x,...) do {} while (0)
@@ -55,10 +68,20 @@ extern void rtl871x_cedbg(const char *fmt, ...);
 
 #define RTW_DBGDUMP 0 /* 'stream' for _dbgdump */
 
+
+
 #undef _dbgdump
 #undef _seqdump
 
-#if defined PLATFORM_LINUX
+#if defined(PLATFORM_WINDOWS) && defined(PLATFORM_OS_XP)
+	#define _dbgdump DbgPrint
+	#define KERN_CONT
+	#define _seqdump(sel, fmt, arg...) _dbgdump(fmt, ##arg)
+#elif defined(PLATFORM_WINDOWS) && defined(PLATFORM_OS_CE)
+	#define _dbgdump rtl871x_cedbg
+	#define KERN_CONT
+	#define _seqdump(sel, fmt, arg...) _dbgdump(fmt, ##arg)
+#elif defined PLATFORM_LINUX
 	#define _dbgdump printk
 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
 	#define KERN_CONT
@@ -100,6 +123,7 @@ extern uint rtw_drv_log_level;
 		} \
 	} while (0)
 
+
 #undef RTW_WARN
 #define RTW_WARN(fmt, arg...)     \
 	do {\
@@ -115,6 +139,7 @@ extern uint rtw_drv_log_level;
 			_dbgdump(DRIVER_PREFIX fmt, ##arg);\
 		} \
 	} while (0)
+
 
 #undef RTW_DBG
 #define RTW_DBG(fmt, arg...)     \
@@ -154,6 +179,7 @@ extern uint rtw_drv_log_level;
 		} \
 	} while (0)
 
+
 #undef _RTW_WARN
 #define _RTW_WARN(fmt, arg...)     \
 	do {\
@@ -178,12 +204,14 @@ extern uint rtw_drv_log_level;
 		} \
 	} while (0)
 
+
 /* other debug APIs */
 #undef RTW_DBG_EXPR
 #define RTW_DBG_EXPR(EXPR) do { if (_DRV_DEBUG_ <= rtw_drv_log_level) EXPR; } while (0)
 
 #endif /* defined(_dbgdump) */
 #endif /* CONFIG_RTW_DEBUG */
+
 
 #if defined(_seqdump)
 /* dump message to selected 'stream' with driver-defined prefix */
@@ -216,6 +244,7 @@ extern uint rtw_drv_log_level;
 #define RTW_MAP_DUMP_SEL(sel, _TitleString, _HexData, _HexDataLen) \
 	RTW_BUF_DUMP_SEL(_DRV_ALWAYS_, sel, _TitleString, _TRUE, _HexData, _HexDataLen)
 #endif /* defined(_seqdump) */
+
 
 #ifdef CONFIG_DBG_COUNTER
 	#define DBG_COUNTER(counter) counter++
@@ -251,18 +280,6 @@ void dump_sec_cam_ent(void *sel, struct sec_cam_ent *ent, int id);
 void dump_sec_cam_ent_title(void *sel, u8 has_id);
 void dump_sec_cam(void *sel, _adapter *adapter);
 void dump_sec_cam_cache(void *sel, _adapter *adapter);
-
-bool rtw_fwdl_test_trigger_chksum_fail(void);
-bool rtw_fwdl_test_trigger_wintint_rdy_fail(void);
-bool rtw_del_rx_ampdu_test_trigger_no_tx_fail(void);
-u32 rtw_get_wait_hiq_empty_ms(void);
-void rtw_sta_linking_test_set_start(void);
-bool rtw_sta_linking_test_wait_done(void);
-bool rtw_sta_linking_test_force_fail(void);
-#ifdef CONFIG_AP_MODE
-u16 rtw_ap_linking_test_force_auth_fail(void);
-u16 rtw_ap_linking_test_force_asoc_fail(void);
-#endif
 
 #ifdef CONFIG_PROC_DEBUG
 ssize_t proc_set_write_reg(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
@@ -321,11 +338,20 @@ ssize_t proc_set_bmc_tx_rate(struct file *file, const char __user *buffer, size_
 int proc_get_ps_dbg_info(struct seq_file *m, void *v);
 ssize_t proc_set_ps_dbg_info(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 
+bool rtw_fwdl_test_trigger_chksum_fail(void);
+bool rtw_fwdl_test_trigger_wintint_rdy_fail(void);
 ssize_t proc_set_fwdl_test_case(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
+bool rtw_del_rx_ampdu_test_trigger_no_tx_fail(void);
 ssize_t proc_set_del_rx_ampdu_test_case(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
+u32 rtw_get_wait_hiq_empty_ms(void);
 ssize_t proc_set_wait_hiq_empty(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
+void rtw_sta_linking_test_set_start(void);
+bool rtw_sta_linking_test_wait_done(void);
+bool rtw_sta_linking_test_force_fail(void);
 ssize_t proc_set_sta_linking_test(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 #ifdef CONFIG_AP_MODE
+u16 rtw_ap_linking_test_force_auth_fail(void);
+u16 rtw_ap_linking_test_force_asoc_fail(void);
 ssize_t proc_set_ap_linking_test(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 #endif
 
@@ -447,6 +473,7 @@ ssize_t proc_set_pci_conf_space(struct file *file, const char __user *buffer, si
 int proc_get_pci_bridge_conf_space(struct seq_file *m, void *v);
 ssize_t proc_set_pci_bridge_conf_space(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 
+
 #ifdef DBG_TXBD_DESC_DUMP
 int proc_get_tx_ring_ext(struct seq_file *m, void *v);
 ssize_t proc_set_tx_ring_ext(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
@@ -526,9 +553,6 @@ ssize_t proc_set_pathb_phase(struct file *file, const char __user *buffer, size_
 int proc_get_mcc_info(struct seq_file *m, void *v);
 ssize_t proc_set_mcc_enable(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 ssize_t proc_set_mcc_duration(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#ifdef CONFIG_MCC_PHYDM_OFFLOAD
-ssize_t proc_set_mcc_phydm_offload_enable(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-#endif
 ssize_t proc_set_mcc_single_tx_criteria(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 ssize_t proc_set_mcc_ap_bw20_target_tp(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 ssize_t proc_set_mcc_ap_bw40_target_tp(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);

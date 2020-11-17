@@ -17,15 +17,15 @@
 *                           MUSB.TXT
 ******************************************************************************/
 
-u16
-EFUSE_GetArrayLen_MP_8821A_MUSB(void);
+u2Byte
+EFUSE_GetArrayLen_MP_8821A_MUSB(VOID);
 
-void
+VOID
 EFUSE_GetMaskArray_MP_8821A_MUSB(
-	u8* Array
+	IN	OUT pu1Byte Array
 );
 
-boolean
+BOOLEAN
 EFUSE_IsAddressMasked_MP_8821A_MUSB(/* TC: Test Chip, MP: MP Chip */
-	u16  Offset
+	IN   u2Byte  Offset
 );
