@@ -61,10 +61,7 @@ function set_param_clang()
     #Export SUBARCH <arm, arm64, x86, x86_64>
     export SUBARCH=arm64
 
-    # Kbuild host and user
-    export KBUILD_BUILD_USER="S133PY"
-    export KBUILD_BUILD_HOST="Kali"
-    export KBUILD_JOBS="$((`grep -c '^processor' /proc/cpuinfo` * 2))"
+
 
     # Compiler
     GCC32=$wd/clang/bin/arm-linux-gnueabi-
