@@ -36,7 +36,7 @@ function clone_aosp_clang()
     git clone --depth=1 --quiet https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 gcc32
     mkdir clang
     cd clang || exit
-    wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r383902.tar.gz 
+    wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r383902.tar.gz
     tar -xzf clang*
     cd .. || exit
 }
@@ -135,7 +135,7 @@ function build_gcc()
 
     # Build
     make O="${OUT}" -j"${KBUILD_JOBS}" 2>&1| tee "${OUT}"/build.log
-    
+
     BUILD_END=$(date +"%s")
     DIFF=$(($BUILD_END - $BUILD_START))
 
@@ -162,7 +162,7 @@ function build_clang()
 
     # Build
     make -j"${KBUILD_JOBS}" O=$OUT CC="${TC}" LLVM_AR="${CLANG_DIR}/bin/llvm-ar" LLVM_NM="${CLANG_DIR}/bin/llvm-nm" LD="${CLANG_DIR}/bin/ld.lld" OBJCOPY="${CLANG_DIR}/bin/llvm-objcopy" OBJDUMP="${CLANG_DIR}/bin/llvm-objdump" STRIP="${CLANG_DIR}/bin/llvm-strip" CROSS_COMPILE="${GCC64}" CROSS_COMPILE_ARM32="${GCC32}" CLANG_TRIPLE="${GCC64_TYPE}" 2>&1| tee $OUT/build.log
-
+    make -j"${KBUILD_JOBS}" O=$OUT CC="${TC}" LLVM_AR="${CLANG_DIR}/bin/llvm-ar" LLVM_NM="${CLANG_DIR}/bin/llvm-nm" LD="${CLANG_DIR}/bin/ld.lld" OBJCOPY="${CLANG_DIR}/bin/llvm-objcopy" OBJDUMP="${CLANG_DIR}/bin/llvm-objdump" STRIP="${CLANG_DIR}/bin/llvm-strip" CROSS_COMPILE="${GCC64}" CROSS_COMPILE_ARM32="${GCC32}" CLANG_TRIPLE="${GCC64_TYPE}" modules_install INSTALL_MOD_PATH=modules_out 2>&1| tee $OUT/build.log
     BUILD_END=$(date +"%s")
     DIFF=$(($BUILD_END - $BUILD_START))
 
@@ -189,7 +189,7 @@ function build_proton_clang()
 
     # Build
     make -j"${KBUILD_JOBS}" O=$OUT CC="${TC}" LLVM_AR="${CLANG_DIR}/bin/llvm-ar" LLVM_NM="${CLANG_DIR}/bin/llvm-nm" LD="${CLANG_DIR}/bin/ld.lld" OBJCOPY="${CLANG_DIR}/bin/llvm-objcopy" OBJDUMP="${CLANG_DIR}/bin/llvm-objdump" STRIP="${CLANG_DIR}/bin/llvm-strip" CROSS_COMPILE="${GCC64}" CROSS_COMPILE_ARM32="${GCC32}" CLANG_TRIPLE="${GCC64_TYPE}" 2>&1| tee $OUT/build.log
-
+    make -j"${KBUILD_JOBS}" O=$OUT CC="${TC}" LLVM_AR="${CLANG_DIR}/bin/llvm-ar" LLVM_NM="${CLANG_DIR}/bin/llvm-nm" LD="${CLANG_DIR}/bin/ld.lld" OBJCOPY="${CLANG_DIR}/bin/llvm-objcopy" OBJDUMP="${CLANG_DIR}/bin/llvm-objdump" STRIP="${CLANG_DIR}/bin/llvm-strip" CROSS_COMPILE="${GCC64}" CROSS_COMPILE_ARM32="${GCC32}" modules_install INSTALL_MOD_PATH=modules_out CLANG_TRIPLE="${GCC64_TYPE}" 2>&1| tee $OUT/build.log
     BUILD_END=$(date +"%s")
     DIFF=$(($BUILD_END - $BUILD_START))
 
@@ -216,7 +216,7 @@ function build_aosp_clang()
 
     # Build
     make -j"${KBUILD_JOBS}" O=$OUT ARCH=arm64 CC=$WD"/clang/bin/clang" CLANG_TRIPLE="aarch64-linux-gnu-" CROSS_COMPILE=$WD"/gcc/bin/aarch64-linux-android-" CROSS_COMPILE_ARM32=$WD"/gcc32/bin/arm-linux-androideabi-"  2>&1| tee $OUT/build.log
-
+    make -j"${KBUILD_JOBS}" O=$OUT ARCH=arm64 CC=$WD"/clang/bin/clang" CLANG_TRIPLE="aarch64-linux-gnu-" CROSS_COMPILE=$WD"/gcc/bin/aarch64-linux-android-" CROSS_COMPILE_ARM32=$WD"/gcc32/bin/arm-linux-androideabi-" modules_install INSTALL_MOD_PATH=modules_out  2>&1| tee $OUT/build.log
     if [ -f "${IMG}" ]; then
         BUILD_END=$(date +"%s")
         DIFF=$(($BUILD_END - $BUILD_START))
@@ -239,12 +239,17 @@ function flash_zip()
     check_camera
 
     export ZIPNAME=Team420-${CAM_TYPE}-${DATE}.zip
-    
+
     # Checkout anykernel3 dir
     cd "${ANYKERNEL_DIR}"
 
     # Copy Image.gz-dtb to dir.
     cp ${OUT}/arch/arm64/boot/Image.gz-dtb ${ANYKERNEL_DIR}/
+    rm -f Team420-*.zip
+    rm -f Image.gz-dtb
+    cp -r $out/modules_out/* $ANYKERNEL_DIR/modules/
+    rm $ANYKERNEL_DIR/modules/lib/modules/*/source
+    rm $ANYKERNEL_DIR/modules/lib/modules/*/build
 
     # Build a flashable zip
     zip -r9 ${ZIPNAME} * -x README.md .git
@@ -275,7 +280,7 @@ function tg_inform()
 function tg_push()
 {
     ZIP="${ANYKERNEL_DIR}"/$(echo Team420-*.zip)
-    
+
     curl -F document=@"${ZIP}" "https://api.telegram.org/bot${TG_BOT_API}/sendDocument" \
 			-F chat_id="${CHAT_ID}" \
 			-F "disable_web_page_preview=true" \
