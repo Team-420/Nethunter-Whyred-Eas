@@ -248,8 +248,8 @@ function flash_zip()
     cp ${OUT}/arch/arm64/boot/Image.gz-dtb ${ANYKERNEL_DIR}/
     rm -f Team420-*.zip
     cp -r ${OUT}/modules_out/* $ANYKERNEL_DIR/modules/
-    rm $ANYKERNEL_DIR/modules/lib/modules/*/source
-    rm $ANYKERNEL_DIR/modules/lib/modules/*/build
+    rm ${ANYKERNEL_DIR}/modules/lib/modules/*/source
+    rm ${ANYKERNEL_DIR}/modules/lib/modules/*/build
 
     # Build a flashable zip
     zip -r9 ${ZIPNAME} * -x README.md .git
