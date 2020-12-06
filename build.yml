@@ -1,0 +1,36 @@
+kind: pipeline
+name: RAD NETHUNTER KERNEL BUILD OLDCAM
+
+clone:
+  disable: true
+
+steps:
+- name: oldcam
+  image: archlinux:latest
+  environment:
+      TG_BOT_API:
+        from_secret: TG_BOT_API
+  commands:
+    - "export TG_BOT_API"
+    - pacman -Sy base-devel bc llvm curl zip wget git --noconfirm
+    - git clone --depth=1 --quiet https://github.com/Team-420/Nethunter-Whyred-Eas.git -b ${DRONE_COMMIT_BRANCH} source && cd source
+    - script -c "bash -x build --oldcam --gcc --gcc-stable" build.log && bash build-log-push
+
+---
+kind: pipeline
+name: RAD NETHUNTER KERNEL BUILD NEWCAM
+
+clone:
+  disable: true
+
+steps:
+- name: newcam
+  image: archlinux:latest
+  environment:
+      TG_BOT_API:
+        from_secret: TG_BOT_API
+  commands:
+    - "export TG_BOT_API"
+    - pacman -Sy base-devel bc llvm curl zip wget git --noconfirm
+    - git clone --depth=1 --quiet https://github.com/Team-420/Nethunter-Whyred-Eas.git -b ${DRONE_COMMIT_BRANCH} source && cd source
+    - script -c "bash -x build --newcam --gcc --gcc-master" build.log && bash build-log-push
