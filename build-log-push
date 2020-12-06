@@ -1,0 +1,20 @@
+#!/bin/bash
+
+CHAT_ID="-1001355665867"
+
+function send_kernel_logs()
+{
+	# Recorded log file path.
+    LOG=/drone/src/source/build.log
+
+	# Scrub appended secrets from file.
+	sed -i s/${TG_BOT_API}/123:xyz/g ${LOG}
+
+	curl -F document=@"${LOG}" "https://api.telegram.org/bot${TG_BOT_API}/sendDocument" \
+		-F chat_id="${CHAT_ID}" \
+		-F "disable_web_page_preview=true" \
+		-F "parse_mode=html" \
+        -F caption="Rad Nethunter Kernel Build Logs"
+}
+
+send_kernel_logs
