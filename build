@@ -49,7 +49,7 @@ function clone_gcc()
 
 function clone_anykernel()
 {
-    git clone --depth=1 --quiet https://github.com/theradcolor/AnyKernel3 -b ak-eas
+    git clone --depth=1 --quiet https://github.com/Team-420/anykernel.git -b whyred
 }
 
 function checkout_source()

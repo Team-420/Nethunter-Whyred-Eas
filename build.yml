@@ -14,7 +14,7 @@ steps:
     - "export TG_BOT_API"
     - pacman -Sy base-devel bc llvm curl zip wget git --noconfirm
     - git clone --depth=1 --quiet https://github.com/Team-420/Nethunter-Whyred-Eas.git -b ${DRONE_COMMIT_BRANCH} source && cd source
-    - script -c "bash -x build --oldcam --proton-clang" build.log && bash build-log-push
+    - script -c "bash -x build --oldcam --gcc --gcc-master" build.log && bash build-log-push
 
 ---
 kind: pipeline
@@ -33,4 +33,4 @@ steps:
     - "export TG_BOT_API"
     - pacman -Sy base-devel bc llvm curl zip wget git --noconfirm
     - git clone --depth=1 --quiet https://github.com/Team-420/Nethunter-Whyred-Eas.git -b ${DRONE_COMMIT_BRANCH} source && cd source
-    - script -c "bash -x build --newcam --proton-clang" build.log && bash build-log-push
+    - script -c "bash -x build --newcam --gcc --gcc-master" build.log && bash build-log-push
