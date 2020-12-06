@@ -55,6 +55,8 @@ Module.symvers
 /AnyKernel3
 /clang
 /clang-bk
+/gcc32
+/gcc64
 
 
 #

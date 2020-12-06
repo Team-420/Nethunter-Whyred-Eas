@@ -19,7 +19,7 @@ OUT=${WD}"/out"
 KERNEL_DIR=${WD}
 ANYKERNEL_DIR=${WD}"/AnyKernel3"
 IMG=${OUT}"/arch/arm64/boot/Image.gz-dtb"
-
+rm -rf $OUT/modules_out
 function clone_clang()
 {
     git clone --depth=1 --quiet https://github.com/theradcolor/clang clang
