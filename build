@@ -17,7 +17,7 @@ CHAT_ID="-1001355665867"
 WD=$(pwd)
 OUT=${WD}"/out"
 KERNEL_DIR=${WD}
-ANYKERNEL_DIR=${WD}"/AnyKernel3"
+ANYKERNEL_DIR=${WD}"/anykernel"
 IMG=${OUT}"/arch/arm64/boot/Image.gz-dtb"
 rm -rf $OUT/modules_out
 function clone_clang()
