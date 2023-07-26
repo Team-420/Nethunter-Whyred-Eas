@@ -645,7 +645,7 @@ afunc_bind(struct usb_configuration *cfg, struct usb_function *fn)
 	}
 
 	ret = set_ep_max_packet_size(uac2_opts, &hs_epout_desc, USB_SPEED_HIGH,
-				     false);
+				     false);git
 	if (ret < 0) {
 		dev_err(dev, "%s:%d Error!\n", __func__, __LINE__);
 		return ret;
