@@ -444,6 +444,13 @@ __primary_switched:
 	msr	sp_el0, x4			// Save thread_info
 #endif
 
+1:	cmp	x6, x7
+	b.hs	2f
+	str	xzr, [x6], #8			// Clear BSS
+	b	1b
+2:
+	adrp	x4, initial_sp
+	add	sp, x4, :lo12:initial_sp
 	str_l	x21, __fdt_pointer, x5		// Save FDT pointer
 
 	ldr_l	x4, kimage_vaddr		// Save the offset between
