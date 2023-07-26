@@ -3021,6 +3021,7 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr)
 	 */
 	mmc_host_clk_hold(host);
 	err = mmc_wait_for_cmd(host, &cmd, 0);
+
 	if (err) {
 		if (err == -ETIMEDOUT) {
 			pr_debug("%s: voltage switching failed with err %d\n",
@@ -3031,6 +3032,11 @@ int mmc_set_signal_voltage(struct mmc_host *host, int signal_voltage, u32 ocr)
 			goto err_command;
 		}
 	}
+	if (err)
+		goto power_cycle;
+
+	if (!mmc_host_is_spi(host) && (cmd.resp[0] & R1_ERROR))
+		return -EIO;
 
 	if (!mmc_host_is_spi(host) && (cmd.resp[0] & R1_ERROR)) {
 		err = -EIO;
